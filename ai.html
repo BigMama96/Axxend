@@ -1,0 +1,498 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Axxy - Fashion Chat</title>
+  <style>
+    body{
+      margin:0;
+      font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;
+      background:#FFF4E0;
+      display:flex;
+      justify-content:center;
+      align-items:center;
+      min-height:100vh;
+      padding:16px;
+    }
+
+    .chat-wrap{
+      width:min(560px, 100%);
+      background:#fff;
+      border:1px solid #e7e9f2;
+      border-radius:14px;
+      box-shadow:0 10px 30px rgba(20,30,60,.08);
+      overflow:hidden;
+    }
+
+    .header{
+      padding:14px 16px;
+      background:#B46060;
+      color:#fff;
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:10px;
+    }
+
+    .header-left{
+      display:flex;
+      align-items:center;
+      gap:10px;
+      min-width:0;
+    }
+
+    .back-btn{
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      width:40px;
+      height:40px;
+      border:none;
+      border-radius:10px;
+      background:rgba(255,255,255,.18);
+      color:#fff;
+      cursor:pointer;
+      flex-shrink:0;
+      transition:.2s ease;
+    }
+
+    .back-btn:hover{
+      background:rgba(255,255,255,.28);
+    }
+
+    .back-btn svg{
+      width:20px;
+      height:20px;
+    }
+
+    .brand{
+      display:flex;
+      align-items:center;
+      gap:10px;
+      min-width:0;
+    }
+
+    .bot-icon{
+      width:42px;
+      height:42px;
+      border-radius:12px;
+      object-fit:cover;
+      background:#fff;
+      flex-shrink:0;
+      box-shadow:0 2px 8px rgba(0,0,0,.12);
+    }
+
+    .header .title{
+      font-weight:800;
+      font-size:18px;
+      white-space:nowrap;
+      overflow:hidden;
+      text-overflow:ellipsis;
+    }
+
+    .header .badge{
+      background:rgba(255,255,255,.16);
+      border:1px solid rgba(255,255,255,.22);
+      padding:6px 10px;
+      border-radius:999px;
+      font-size:12px;
+      white-space:nowrap;
+      flex-shrink:0;
+    }
+
+    .messages{
+      height:460px;
+      overflow:auto;
+      padding:14px;
+      background:#FFF4E0;
+    }
+
+    .msg{
+      display:flex;
+      margin:10px 0;
+      align-items:flex-end;
+      gap:8px;
+    }
+
+    .bubble{
+      max-width:86%;
+      padding:10px 12px;
+      border-radius:14px;
+      border:1px solid #eef0f6;
+      background:#fff;
+      line-height:1.35;
+      word-wrap:break-word;
+      white-space:pre-wrap;
+    }
+
+    .msg.user{
+      justify-content:flex-end;
+    }
+
+    .msg.user .bubble{
+      background:#B46060;
+      color:#fff;
+      border-color:#B46060;
+      border-top-right-radius:6px;
+    }
+
+    .msg.bot{
+      justify-content:flex-start;
+    }
+
+    .msg.bot .bubble{
+      border-top-left-radius:6px;
+      background:#fff;
+    }
+
+    .msg.bot .bot-avatar{
+      width:34px;
+      height:34px;
+      border-radius:50%;
+      object-fit:cover;
+      flex-shrink:0;
+      box-shadow:0 2px 8px rgba(0,0,0,.12);
+      background:#fff;
+    }
+
+    .msg.bot a{
+      color:#B46060;
+      text-decoration:underline;
+    }
+
+    .composer{
+      display:flex;
+      gap:10px;
+      padding:12px;
+      border-top:1px solid #e7e9f2;
+      background:#fff;
+    }
+
+    textarea{
+      flex:1;
+      resize:none;
+      border:1px solid #e7e9f2;
+      border-radius:10px;
+      padding:10px 12px;
+      font-size:14px;
+      outline:none;
+      min-height:44px;
+      max-height:140px;
+      background:#fff;
+    }
+
+    textarea:focus{
+      border-color:#B46060;
+      box-shadow:0 0 0 4px rgba(180,96,96,.25);
+    }
+
+    button{
+      border:none;
+      border-radius:10px;
+      background:#FFBF00;
+      color:#111827;
+      padding:10px 14px;
+      font-weight:700;
+      cursor:pointer;
+      min-width:120px;
+    }
+
+    button:disabled{
+      opacity:.6;
+      cursor:not-allowed;
+    }
+
+    .hint{
+      padding:0 12px 12px;
+      color:#6b7280;
+      font-size:12px;
+    }
+
+    .quickrow{
+      display:flex;
+      gap:8px;
+      flex-wrap:wrap;
+      padding:0 12px 12px;
+    }
+
+    .chip{
+      border:1px solid #e7e9f2;
+      background:#fff;
+      padding:6px 10px;
+      border-radius:999px;
+      font-size:12px;
+      cursor:pointer;
+      color:#111827;
+      user-select:none;
+    }
+
+    .chip:hover{
+      background:#FFF4E0;
+    }
+
+    @media (max-width:560px){
+      .header{
+        padding:12px;
+      }
+
+      .header .title{
+        font-size:16px;
+      }
+
+      .header .badge{
+        display:none;
+      }
+
+      .back-btn{
+        width:36px;
+        height:36px;
+      }
+
+      .bot-icon{
+        width:38px;
+        height:38px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="chat-wrap">
+    <div class="header">
+      <div class="header-left">
+        <button class="back-btn" onclick="window.location.href='iindex.html'" aria-label="Go back to home page">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <path d="M15 18l-6-6 6-6"></path>
+          </svg>
+        </button>
+
+        <div class="brand">
+          <img src="Adobe Express - file.png" alt="Axxy icon" class="bot-icon">
+          <div class="title">Axxy - Style Assistant</div>
+        </div>
+      </div>
+
+      <div class="badge" id="welcomeBadge">Hi!</div>
+    </div>
+
+    <div class="messages" id="messages" aria-live="polite"></div>
+
+    <div class="quickrow" aria-label="Quick prompts">
+      <div class="chip" data-text="What should I wear for a date night?">Date night</div>
+      <div class="chip" data-text="Shoes that match a black dress?">Black dress + shoes</div>
+      <div class="chip" data-text="I want a simple everyday outfit (jeans + top).">Everyday outfit</div>
+      <div class="chip" data-text="Help me match colors: neutrals with one accent.">Color matching</div>
+    </div>
+
+    <div class="composer">
+      <textarea id="input" placeholder="Ask Axxy for fashion advice..."></textarea>
+      <button id="sendBtn">Send</button>
+    </div>
+
+    <div class="hint">Back-and-forth supported (conversation history included). Demo mode uses local rules.</div>
+  </div>
+
+  <script>
+    const userName = "joanna";
+
+    const messagesEl = document.getElementById("messages");
+    const inputEl = document.getElementById("input");
+    const sendBtn = document.getElementById("sendBtn");
+    const welcomeBadge = document.getElementById("welcomeBadge");
+
+    const history = [];
+
+    function escapeHtml(str){
+      return String(str)
+        .replaceAll("&","&amp;")
+        .replaceAll("<","&lt;")
+        .replaceAll(">","&gt;")
+        .replaceAll('"',"&quot;")
+        .replaceAll("'","&#039;");
+    }
+
+    function linkify(text){
+      const safe = escapeHtml(text);
+      return safe.replace(
+        /(https?:\/\/[^\s]+)/g,
+        (url) => `<a href="${url}" target="_blank" rel="noopener noreferrer">${url}</a>`
+      );
+    }
+
+    function addMessage(text, role){
+      history.push({ role, text });
+
+      const msg = document.createElement("div");
+      msg.className = `msg ${role}`;
+
+      if (role === "bot"){
+        const avatar = document.createElement("img");
+        avatar.className = "bot-avatar";
+        avatar.src = "Adobe Express - file.png";
+        avatar.alt = "Axxy avatar";
+        msg.appendChild(avatar);
+      }
+
+      const bubble = document.createElement("div");
+      bubble.className = "bubble";
+      bubble.innerHTML = linkify(text);
+
+      msg.appendChild(bubble);
+      messagesEl.appendChild(msg);
+      messagesEl.scrollTop = messagesEl.scrollHeight;
+    }
+
+    function disableUI(disabled){
+      sendBtn.disabled = disabled;
+      inputEl.disabled = disabled;
+    }
+
+    function getRecentContext(){
+      const recent = history.slice(-6);
+      return recent.map(m => `${m.role === "user" ? "User" : "Bot"}: ${m.text}`).join("\n");
+    }
+
+    function extractSignals(text){
+      const t = text.toLowerCase();
+
+      const signals = {
+        occasion: null,
+        item: null,
+        colors: [],
+        shoesMention: /(shoes|heels|sneakers|boots|boot|sandal)/.test(t),
+        dressMention: /(dress|black dress|sundress|maxi|midi)/.test(t),
+        denimMention: /(jeans|denim|pants|trousers)/.test(t),
+        budgetMention: /(budget|affordable|cheap)/.test(t),
+      };
+
+      if (/(date|dinner|romantic)/.test(t)) signals.occasion = "date night";
+      else if (/(work|office|interview)/.test(t)) signals.occasion = "work";
+      else if (/(casual|everyday|weekend|coffee)/.test(t)) signals.occasion = "casual";
+      else if (/(wedding|guest|party)/.test(t)) signals.occasion = "event";
+
+      if (/dress/.test(t)) signals.item = "dress";
+      else if (/jeans|denim|pants/.test(t)) signals.item = "denim";
+      else if (/shoes|heels|sneakers|boots/.test(t)) signals.item = "shoes";
+
+      const colorWords = ["black","white","beige","cream","navy","camel","burgundy","red","pink","blue","green","olive","gray","grey","tan","brown","gold","silver"];
+      for (const c of colorWords){
+        if (t.includes(c)) signals.colors.push(c);
+      }
+
+      return signals;
+    }
+
+    function botReply(userText){
+      const context = getRecentContext();
+      const signals = extractSignals(userText);
+
+      const links = {
+        shoes: [
+          "https://www.nordstrom.com/",
+          "https://www.zappos.com/"
+        ],
+        dresses: [
+          "https://www.nordstrom.com/browse/dresses",
+          "https://www.asos.com/women/dresses/cat/"
+        ],
+        outfits: [
+          "https://www.uniqlo.com/us/en/women",
+          "https://www.cos.com/en_us/"
+        ],
+        basics: [
+          "https://www.everlane.com/",
+          "https://www.cos.com/en_us/"
+        ]
+      };
+
+      const ask = (q) => `Quick question, ${userName}: ${q}`;
+
+      if (signals.dressMention || /(black dress)/.test(userText.toLowerCase())){
+        return `For a ${signals.colors.includes("black") ? "black" : "dress"} look:\n` +
+               `• Shoes: pick either (1) a classic neutral (black/nude) or (2) a contrast accent (camel/navy/burgundy).\n` +
+               `• Accessories: keep jewelry 1–2 focal points (earrings OR a necklace).\n\n` +
+               `${ask("What's the occasion (date, work, brunch) and do you want comfort or a heel?")}\n\n` +
+               `Links: ${links.dresses.join(" ")} ${links.shoes.join(" ")}`;
+      }
+
+      if (signals.shoesMention){
+        return `Shoes matching tip:\n` +
+               `• If your outfit is mostly neutral, go for a pop (camel/navy/burgundy).\n` +
+               `• If your outfit has bold colors, match the shoe to ONE color you're wearing.\n\n` +
+               `${ask("What are you wearing with the shoes (top/bottom color) and where are you going?")}\n\n` +
+               `Shop ideas: ${links.shoes.join(" ")}`;
+      }
+
+      if (signals.denimMention){
+        return `Denim styling:\n` +
+               `• High-rise = longer-looking legs; mid-rise = easiest everyday.\n` +
+               `• With denim, a tucked-in top + a belt elevates the whole look.\n\n` +
+               `${ask("Are your jeans skinny, straight, or wide—and are they dark or light wash?")}\n\n` +
+               `More inspiration: ${links.basics.join(" ")} ${links.outfits.join(" ")}`;
+      }
+
+      if (signals.budgetMention){
+        return `Budget plan (works great, ${userName}):\n` +
+               `• Choose one "hero" item (shoes OR jacket).\n` +
+               `• Build the rest from easy basics you can reuse.\n` +
+               `• Add interest with accessories (belt, bag, earrings).\n\n` +
+               `${ask("What budget range and what items do you need most? shoes, dress, or tops?")}\n\n` +
+               `Affordable inspiration: ${links.outfits.join(" ")} ${links.basics.join(" ")}`;
+      }
+
+      if (signals.occasion){
+        const occ = signals.occasion;
+        return `Okay, ${userName}—for a ${occ} outfit:\n` +
+               `• Start with a base (jeans/chinos or a simple dress).\n` +
+               `• Add one structured piece (blazer, denim jacket, or a fitted cardigan).\n` +
+               `• Finish with shoes + one accessory that matches a color you like.\n\n` +
+               `${ask("What colors do you want to wear (or avoid) and what's the weather like?")}\n\n` +
+               `Outfit inspiration: ${links.outfits.join(" ")}`;
+      }
+
+      return `Tell me what you're trying to wear, ${userName}:\n` +
+             `1) the item (dress/shoes/jeans/outfit)\n` +
+             `2) the occasion\n` +
+             `3) your vibe (simple, classy, trendy, comfy)\n\n` +
+             `Then I'll suggest a specific look + links.`;
+    }
+
+    function handleSend(){
+      const text = inputEl.value.trim();
+      if (!text) return;
+
+      addMessage(text, "user");
+      inputEl.value = "";
+      disableUI(true);
+
+      setTimeout(() => {
+        const reply = botReply(text);
+        addMessage(reply, "bot");
+        disableUI(false);
+      }, 350);
+    }
+
+    sendBtn.addEventListener("click", handleSend);
+
+    inputEl.addEventListener("keydown", (e) => {
+      if (e.key === "Enter" && !e.shiftKey){
+        e.preventDefault();
+        handleSend();
+      }
+    });
+
+    document.querySelectorAll(".chip").forEach(chip => {
+      chip.addEventListener("click", () => {
+        inputEl.value = chip.dataset.text || "";
+        inputEl.focus();
+      });
+    });
+
+    welcomeBadge.textContent = `Hi ${userName}!`;
+    addMessage(
+      `Hi ${userName}! I'm Axxy, your Style Assistant. Ask me fashion questions and I'll keep the conversation going.\n\nTry: "Black dress for a date—shoes and jewelry?"`,
+      "bot"
+    );
+  </script>
+</body>
+</html>
