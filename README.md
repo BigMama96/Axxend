@@ -1,2 +1,0 @@
-# Axxend
-Ascend website
